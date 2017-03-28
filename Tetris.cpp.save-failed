@@ -1,0 +1,353 @@
+/*
+
+    File: tetris.cpp
+    Author: Zane Christenson
+    Date: 6/10/16
+    Version: 1.0.3
+
+*/
+
+#include "tetris.h"
+using namespace std;
+
+
+/*
+    Prints out the game table to console for debugging.
+*/
+void printTable(){
+
+    for(int i = 0; i < board_rows; i++){
+        for(int j = 0; j < board_columns; j++){
+
+            cout << board[i][j] << ",";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+}
+
+
+
+/*
+    randomly generates a new color and block type.
+*/
+void newBlock(){
+
+	blockRow = 0;
+    blockCol = 3;
+
+    //int type = 0;
+    int type = rand() % 7;
+    int color = 1 + rand() % 7;
+
+	color = -1 * color;
+
+    switch(type){
+
+    case 0:   // I
+        board[blockRow + 0][0 + blockCol] = color;
+        board[blockRow + 1][0 + blockCol] = color;
+        board[blockRow + 2][0 + blockCol] = color;
+        board[blockRow + 3][0 + blockCol] = color;
+        break;
+
+    case 1:   // O
+        board[blockRow + 1][0 + blockCol] = color;
+        board[blockRow + 1][1 + blockCol] = color;
+        board[blockRow + 2][0 + blockCol] = color;
+        board[blockRow + 2][1 + blockCol] = color;
+        break;
+    case 2:   // T
+        board[blockRow + 0][1 + blockCol] = color;
+        board[blockRow + 1][1 + blockCol] = color;
+        board[blockRow + 1][2 + blockCol] = color;
+        board[blockRow + 2][1 + blockCol] = color;
+        break;
+    case 3:   // Z
+        board[blockRow + 1][0 + blockCol] = color;
+        board[blockRow + 1][1 + blockCol] = color;
+        board[blockRow + 2][1 + blockCol] = color;
+        board[blockRow + 2][2 + blockCol] = color;
+        break;
+    case 4:   // S
+        board[blockRow + 0][1 + blockCol] = color;
+        board[blockRow + 0][2 + blockCol] = color;
+        board[blockRow + 1][0 + blockCol] = color;
+        board[blockRow + 1][1 + blockCol] = color;
+        break;
+    case 5:   // L
+        board[blockRow + 0][1 + blockCol] = color;
+        board[blockRow + 1][1 + blockCol] = color;
+        board[blockRow + 2][1 + blockCol] = color;
+        board[blockRow + 2][2 + blockCol] = color;
+        break;
+    case 6:   // J
+        board[blockRow + 0][1 + blockCol] = color;
+        board[blockRow + 1][1 + blockCol] = color;
+        board[blockRow + 2][1 + blockCol] = color;
+        board[blockRow + 2][0 + blockCol] = color;
+        break;
+
+    }
+}
+
+
+
+/*
+    changes last block from active to inactive by taking the abs value of the blocks.
+*/
+void spawnNewBlock(){
+
+    for(int i = 19; i >= 0; i--){
+		for(int j = 9; j >= 0; j--){
+
+            board[i][j] = abs(board[i][j]);
+		}
+	}
+
+	checkForCompleteRow();
+    newBlock();
+}
+
+
+
+/*
+    drops all active blocks down one unit every call assuming there are no collisions
+    with walls or other non-active blocks.
+*/
+void blockDrop(){
+
+
+    //check collisions
+	for(int i = 19; i >= 0; i--){
+		for(int j = 9; j >= 0; j--){
+
+            if(board[i][j] < 0){
+
+                if(i == 19){
+                    cout << "[hit bottom bound]\n";
+                    spawnNewBlock();
+                    return;
+
+                } else if(board[i+1][j] > 0){
+                    cout << "[hit block]\n";
+                    spawnNewBlock();
+                    return;
+                }
+            }
+		}
+	}
+
+    // if none, move block
+	for(int i = 19; i >= 0; i--){
+		for(int j = 9; j >= 0; j--){
+
+            if(board[i][j] < 0 && i != 19){
+                board[i+1][j] = board[i][j];
+                board[i][j] = 0;
+            }
+		}
+	}
+
+    blockRow++;
+    printTable();
+}
+
+
+
+/*
+    moves the active block left one unit per function call assuming there are no collisions
+    with walls or other non-active blocks.
+*/
+void moveLeft(){
+
+    cout << "[pressed left]\n" << endl;
+
+    //check collisions
+    for(int i = 19; i >= 0; i--){
+		for(int j = 0; j < 10; j++){
+
+            if(board[i][j] < 0){
+
+                if(j == 0){
+                    cout << "[hit left wall]\n";
+                    return;
+
+                } else if(board[i][j-1] > 0){
+                    cout << "[hit block on left]\n";
+                    return;
+                }
+            }
+        }
+    }
+
+    // if none, move block
+	for(int i = 19; i >= 0; i--){
+		for(int j = 0; j < 10; j++){
+
+               if(board[i][j] < 0 && j != 0){
+                    board[i][j-1] = board[i][j];
+                    board[i][j] = 0;
+                }
+		}
+	}
+
+    blockCol--;
+	printTable();
+}
+
+
+/*
+    moves the active block right one unit per function call assuming there are no collisions
+    with walls or other non-active blocks.
+*/
+void moveRight(){
+
+    cout << "[pressed right]\n";
+
+    //check collisions
+    for(int i = 19; i >= 0; i--){
+		for(int j = 9; j >= 0; j--){
+
+            if(board[i][j] < 0){
+
+                if(j == 9){
+                    cout << "[hit right wall]\n";
+                    return;
+
+                } else if(board[i][j+1] > 0){
+                    cout << "[hit block on right]\n";
+                    return;
+                }
+            }
+        }
+    }
+
+    // if none, move block
+	for(int i = 19; i >= 0; i--){
+		for(int j = 9; j >= 0; j--){
+
+
+               if(board[i][j] < 0 && j != 9){
+                    board[i][j+1] = board[i][j];
+                    board[i][j] = 0;
+                }
+		}
+	}
+    blockCol++;
+	printTable();
+}
+
+
+
+/*
+    Rotates block by 90 degrees clockwise.
+*/
+void rotateBlock(){
+
+    int temp[4][4];
+
+    //check collisions & copy to temp
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++){
+
+            if(board[i + blockRow][j + blockCol] > 0){
+                return;
+            } else {
+                temp[j][3-i] = board[i + blockRow][j + blockCol];
+            }
+        }
+    }
+
+    // if none,
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 4; j++){
+
+            board[i + blockRow][j + blockCol] = temp[i][j];
+        }
+    }
+
+}
+
+
+
+/*
+    removes row passed in argument.
+*/
+void removeRow(int row){
+
+    cout << "[removed row " << row << "]\n";
+
+     for(int i = row; i >= 0; i--){
+        for(int j = 9; j >= 0; j--){
+
+            board[i][j] = board[i-1][j];
+            board[i-1][j] = 0;
+
+        }
+    }
+}
+
+
+
+
+/*
+    Checks for complete row, if found, calls remove row.
+*/
+void checkForCompleteRow(){
+
+    for(int i = 19; i >= 0; i--){
+        for(int j = 9; j >= 0; j--){
+
+            if( !(board[i][j] > 0) ){
+                break;
+            }
+
+            if(j == 0){
+                //complete row found
+                removeRow(i);
+            }
+        }
+    }
+}
+
+
+
+
+/*
+    Sets game over screen and stops game play.
+*/
+void gameOver(){
+
+    gameRunning = false;
+
+}
+
+
+
+/*
+    Initializes global game variables and creates a new blank field.
+*/
+void newGame(){
+
+    gameRunning = true;
+    paused = false;
+
+
+    for(int i = 19; i >= 0; i--){
+        for(int j = 9; j >= 0; j--){
+
+            board[i][j] = 0;
+        }
+    }
+
+    //spawn new block.
+    newBlock();
+
+
+}
+
+
+
+

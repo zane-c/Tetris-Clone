@@ -1,0 +1,5 @@
+esc - pause
+r - restart
+arrow keys for movement
+down arrow to boost
+up arrow to rotate block

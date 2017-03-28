@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1465617430 source:c:\users\zaned\google drive\programming\[ c++ ]\tetris\main.cpp
+	"Tetris.h"
+
+1465617249 c:\users\zaned\google drive\programming\[ c++ ]\tetris\tetris.h
+	<SFML/Graphics.hpp>
+	<SFML/Audio.hpp>
+	<SFML/Graphics/Text.hpp>
+	<iostream>
+	<vector>
+	<string>
+	<sstream>
+	<cmath>
+	<time.h>
+
